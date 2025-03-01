@@ -1,0 +1,15 @@
+# Ignore node modules
+node_modules/
+
+# Ignore environment variables file
+.env
+
+# Ignore log files
+logs/
+*.log
+
+# macOS system files
+.DS_Store
+
+# Optional: ignore build artifacts
+dist/
