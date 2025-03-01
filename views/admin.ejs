@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+      /* Additional inline styles for the admin panel */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th, td {
+        border: 1px solid #ccc;
+        padding: 8px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Admin Panel</h1>
+    <p><a href="/schedule">Back to Schedule</a></p>
+
+    <h2>Set Scheduling Date Range</h2>
+    <form action="/admin/set-dates" method="POST">
+      <label>
+        Start:
+        <input type="date" name="start" value="<%= config.scheduleStart.toISOString().split('T')[0] %>" required>
+      </label><br>
+      <label>
+        End:
+        <input type="date" name="end" value="<%= config.scheduleEnd.toISOString().split('T')[0] %>" required>
+      </label><br>
+      <button type="submit">Save Date Range</button>
+    </form>
+
+    <hr>
+
+    <h2>Data Management</h2>
+    <form action="/admin/clear-data" method="POST">
+      <button type="submit" name="action" value="clearUsers">Clear All Users (except me)</button>
+      <button type="submit" name="action" value="clearAvailabilities">Clear All Availabilities</button>
+    </form>
+
+    <h3>Clear Availabilities by Date Range</h3>
+    <form action="/admin/clear-availability-by-date" method="POST">
+      <label>
+        Start Date:
+        <input type="date" name="start" required>
+      </label>
+      <label>
+        End Date:
+        <input type="date" name="end" required>
+      </label>
+      <button type="submit">Clear Availability by Date Range</button>
+    </form>
+
+    <h3>Clear Availabilities by User</h3>
+    <form action="/admin/clear-availability-by-user" method="POST">
+      <label>
+        User:
+        <select name="userId" required>
+          <% allUsers.forEach(user => { %>
+            <option value="<%= user._id %>"><%= user.username %></option>
+          <% }); %>
+        </select>
+      </label>
+      <button type="submit">Clear Availability by User</button>
+    </form>
+
+    <hr>
+
+    <h2>Edit User Accounts</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Username</th>
+          <th>Password</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Role</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% allUsers.forEach(user => { %>
+          <tr>
+            <form action="/admin/edit-user" method="POST">
+              <input type="hidden" name="userId" value="<%= user._id %>">
+              <td>
+                <input type="text" name="username" value="<%= user.username %>" required>
+              </td>
+              <td>
+                <!-- Leave password blank if no change is desired -->
+                <input type="password" name="password" placeholder="New password">
+              </td>
+              <td>
+                <input type="text" name="firstName" value="<%= user.firstName %>" required>
+              </td>
+              <td>
+                <input type="text" name="lastName" value="<%= user.lastName %>" required>
+              </td>
+              <td>
+                <select name="role">
+                  <option value="user" <%= user.role === 'user' ? 'selected' : '' %>>User</option>
+                  <option value="admin" <%= user.role === 'admin' ? 'selected' : '' %>>Admin</option>
+                </select>
+              </td>
+              <td>
+                <button type="submit">Update</button>
+              </td>
+            </form>
+            <td>
+              <% if (user._id.toString() !== currentUserId) { %>
+                <form action="/admin/delete-user" method="POST" onsubmit="return confirm('Delete user <%= user.username %>?');">
+                  <input type="hidden" name="userId" value="<%= user._id %>">
+                  <button type="submit">Delete</button>
+                </form>
+              <% } %>
+            </td>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Schedule</title>
+    <link rel="stylesheet" href="/style.css">
+    <!-- Include Titillium Web from Google Fonts -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600&display=swap"
+      rel="stylesheet"
+    >
+    <style>
+      body {
+        font-family: 'Titillium Web', sans-serif;
+        margin: 20px;
+        background-color: #f4f4f4;
+      }
+      /* Top-right logo */
+      .logo-top-right {
+        float: right;
+        margin: 0 0 10px 10px;
+      }
+      .logo-top-right img {
+        width: 150px;
+      }
+      h1 {
+        text-align: center;
+        font-size: 3em;
+        color: #041E42;
+      }
+      /* Keep your table/time slot styling in style.css or here if you prefer */
+      table {
+        border-collapse: collapse;
+        width: 100%;
+        background-color: #fff;
+      }
+      th, td {
+        padding: 8px;
+        text-align: center;
+        border: 1px solid #ccc;
+      }
+      .timeslot {
+        cursor: pointer;
+      }
+      .btn {
+        display: inline-block;
+        padding: 8px 16px;
+        margin: 4px;
+        background-color: #041E42;
+        color: #fff;
+        text-decoration: none;
+        border-radius: 4px;
+      }
+      .btn:hover {
+        background-color: #093263;
+      }
+      /* End style overrides */
+    </style>
+  </head>
+  <body>
+    <!-- Logo in top right -->
+    <div class="logo-top-right">
+      <img src="/CWRU_EMS_LOGO.png" alt="CWRU EMS Logo">
+    </div>
+
+    <h1>CWRU EMS Supervisor Schedule</h1>
+
+    <p>
+      <a href="/logout">Logout</a> |
+      <a href="/admin" class="btn">Admin Panel</a>
+    </p>
+
+    <div style="text-align: right; font-size: 1.5em; margin-bottom: 10px;">
+      <%= new Date(dates[0]).getFullYear() %>
+    </div>
+
+    <table border="1">
+      <thead>
+        <tr>
+          <th>Time Slot</th>
+          <% const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]; %>
+          <% dates.forEach(dateStr => {
+               let dateObj = new Date(dateStr);
+               let dayOfWeek = daysOfWeek[dateObj.getDay()];
+               let month = dateObj.getMonth() + 1;
+               let day = dateObj.getDate();
+          %>
+            <th><%= dayOfWeek %> - <%= month %>/<%= day %></th>
+          <% }); %>
+        </tr>
+      </thead>
+      <tbody>
+        <% timeSlots.forEach(slot => { %>
+          <tr>
+            <td><%= slot %></td>
+            <% dates.forEach(date => {
+                 const key = date + '_' + slot;
+                 const usersAvailable = availMap[key] || [];
+                 // Check if the current user is assigned by comparing IDs
+                 const currentUserIsAssigned = usersAvailable.some(u => u.id === currentUserId);
+                 const displayText = usersAvailable.length ? 'Available:' : 'Unassigned:';
+                 const namesText = usersAvailable
+                   .map(u => (u.firstName || '').trim())
+                   .filter(n => n)
+                   .join(', ');
+            %>
+              <td
+                class="timeslot"
+                data-date="<%= date %>"
+                data-slot="<%= slot %>"
+                data-assigned="<%= currentUserIsAssigned %>"
+                style="background-color: <%= usersAvailable.length > 0 ? '#0072ce' : '#c0c0c0' %>;"
+              >
+                <strong><%= usersAvailable.length > 0 ? 'Available:' : 'Unassigned:' %></strong> <%= namesText %>
+              </td>
+            <% }); %>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/main.js"></script>
+  </body>
+</html>
