@@ -35,6 +35,19 @@
 
     <hr>
 
+    <h2>Set Test Call Scheduling Date Range</h2>
+    <form action="/admin/set-test-dates" method="POST">
+      <label>
+      Start:
+      <input type="date" name="start" required>
+      </label>
+      <label>
+        End:
+        <input type="date" name="end" required>
+      </label>
+      <button type="submit">Save Test Schedule Date Range</button>
+    </form>
+
     <h2>Data Management</h2>
     <form action="/admin/clear-data" method="POST">
       <button type="submit" name="action" value="clearUsers">Clear All Users (except me)</button>

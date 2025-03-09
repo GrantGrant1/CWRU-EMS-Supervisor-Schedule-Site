@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>CWRU EMS Supervisor Schedule</title>
+    <title>CWRU EMS Supervisor Test Call Schedule</title>
     <link rel="stylesheet" href="/style.css">
     <!-- Include Titillium Web from Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:wght@400;600&display=swap" rel="stylesheet">
@@ -11,19 +11,11 @@
         margin: 20px;
         background-color: #f4f4f4;
       }
-      .logo-top-right {
-        float: right;
-        margin: 0 0 10px 10px;
-      }
-      .logo-top-right img {
-        width: 150px;
-      }
       h1 {
         text-align: center;
         font-size: 3em;
         color: #041E42;
       }
-      /* Batch controls and header info styling */
       #batch-controls {
         text-align: center;
         font-size: 1.8em;
@@ -33,7 +25,6 @@
         background-color: #e8e8e8;
         border: 1px solid #ccc;
       }
-      /* Table styling with sticky headers and first column */
       table {
         border-collapse: collapse;
         width: 100%;
@@ -46,10 +37,8 @@
         padding: 8px;
         text-align: center;
         border: 1px solid #ccc;
-        -webkit-user-select: none;
-        -moz-user-select: none;
-        -ms-user-select: none;
         user-select: none;
+        color: #000;
       }
       thead th {
         position: sticky;
@@ -66,6 +55,20 @@
       .timeslot {
         cursor: pointer;
       }
+      /* Red color scheme for Test Call schedule */
+      .assigned-cell {
+        background-color: #d32f2f;
+        color: #fff;
+      }
+      .unassigned-cell {
+        background-color: #c0c0c0;
+      }
+      .pending-cell {
+        background-color: #f4a7a7;
+      }
+      .current-day {
+        background-color: yellow;
+      }
       .btn {
         display: inline-block;
         padding: 8px 16px;
@@ -78,37 +81,20 @@
       .btn:hover {
         background-color: #093263;
       }
-      /* Red button styling for Test Call Schedule link */
-      .btn-red {
-        background-color: #d32f2f;
-      }
-      .btn-red:hover {
-        background-color: #b71c1c;
-      }
-      .current-day {
-        background-color: yellow;
-      }
     </style>
   </head>
   <body>
-    <div class="logo-top-right">
-      <img src="/CWRU_EMS_LOGO.png" alt="CWRU EMS Logo">
-    </div>
-
-    <h1>CWRU EMS Supervisor Schedule</h1>
+    <h1>Supervisor Test Call Schedule</h1>
 
     <p>
-      <a href="/logout">Logout</a> |
+      <a href="/schedule" class="btn">Main Schedule</a> |
       <a href="/admin" class="btn">Admin Panel</a> |
-      <a href="/test-schedule" class="btn btn-red">Test Call Schedule</a>
+      <a href="/logout">Logout</a>
     </p>
 
     <div id="batch-controls">
-      <span id="supOnCall" style="margin-right: 20px;">
-        Supervisor On Call: <%= currentOnCall ? currentOnCall : 'TBD' %>
-      </span>
       <% if (isAdmin) { %>
-        <label for="targetUserSelect">Assign shifts for:</label>
+        <label for="targetUserSelect">Assign (Test) shifts for:</label>
         <select id="targetUserSelect">
           <% users.forEach(u => { %>
             <option value="<%= u._id %>">
@@ -117,7 +103,6 @@
           <% }); %>
         </select>
       <% } %>
-      <br>
       <button id="saveButton" class="btn">Save Changes</button>
       <button id="cancelButton" class="btn">Cancel Changes</button>
     </div>
@@ -128,7 +113,7 @@
           <th>Time Slot</th>
           <% dates.forEach(dateStr => {
                let d = new Date(dateStr);
-               const daysOfWeek = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+               const daysOfWeek = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
                let dayOfWeek = daysOfWeek[d.getDay()];
                let month = d.getMonth() + 1;
                let day = d.getDate();
@@ -158,12 +143,11 @@
                    : '';
             %>
               <td
-                class="timeslot"
+                class="timeslot <%= isTaken ? 'assigned-cell' : 'unassigned-cell' %>"
                 data-date="<%= date %>"
                 data-slot="<%= slot %>"
                 data-assigned="<%= currentUserIsAssigned %>"
                 data-taken="<%= isTaken %>"
-                style="background-color: <%= isTaken ? '#0072ce' : '#c0c0c0' %>;"
               >
                 <strong><%= displayText %></strong> <%= namesText %>
               </td>
@@ -178,6 +162,6 @@
       window.isAdmin = <%= isAdmin %>;
     </script>
     <script src="/socket.io/socket.io.js"></script>
-    <script src="/main.js"></script>
+    <script src="/testMain.js"></script>
   </body>
 </html>
